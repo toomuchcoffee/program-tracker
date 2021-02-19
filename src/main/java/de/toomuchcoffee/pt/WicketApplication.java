@@ -10,5 +10,4 @@ public class WicketApplication {
                 .sources(WicketApplication.class)
                 .run(args);
     }
-
 }
