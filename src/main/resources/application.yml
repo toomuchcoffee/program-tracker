@@ -1,3 +1,16 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+  database:
+    driver-class-name: org.postgresql.Driver
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pt
+    username: pt
+    password: s3cr3t
+  flyway:
+    enabled: true
+    table: schema_version
 wicket:
   external:
     spring:
