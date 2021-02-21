@@ -9,6 +9,7 @@ import org.apache.wicket.request.resource.PackageResourceReference;
 public class LayoutPage extends WebPage {
     public LayoutPage(PageParameters parameters) {
         super(parameters);
+        add(new MenuPanel("menuPanel"));
     }
 
     @Override

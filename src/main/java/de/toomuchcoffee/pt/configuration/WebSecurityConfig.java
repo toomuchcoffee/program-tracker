@@ -1,7 +1,9 @@
 package de.toomuchcoffee.pt.configuration;
 
 import de.toomuchcoffee.pt.service.AuthenticatedUserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,49 +13,45 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static de.toomuchcoffee.pt.domain.entity.Role.ADMIN;
+
 @Configuration
+@RequiredArgsConstructor
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    private static final String ADMIN_USERNAME = "admin";
 
-	@Autowired
-	private AuthenticatedUserService authenticatedUserService;
+    @Value("${pt.admin-password}")
+    private String adminPassword;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticatedUserService authenticatedUserService;
 
-	private static final PasswordEncoder PASSWORD_ENCODER = new CustomPasswordEncoder(); // FIXME use BCrypt
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .csrf().disable()
+                .authorizeRequests().antMatchers("/**").permitAll()
+                .and()
+                .logout()
+                .permitAll();
+        http.headers().frameOptions().disable();
+    }
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http
-				.csrf().disable()
-				.authorizeRequests().antMatchers("/**").permitAll()
-				.and()
-				.logout()
-				.permitAll();
-		http.headers().frameOptions().disable();
-	}
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication()
+                .passwordEncoder(passwordEncoder)
+                .withUser(ADMIN_USERNAME)
+                .password(passwordEncoder.encode(adminPassword))
+                .authorities(ADMIN.getAuthorities());
+        auth.userDetailsService(authenticatedUserService)
+                .passwordEncoder(passwordEncoder);
+    }
 
-	@Override
-	@Bean(name = "authenticationManager")
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
-	}
+    @Override
+    @Bean(name = "authenticationManager")
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
-	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		auth
-				.userDetailsService(authenticatedUserService)
-				.passwordEncoder(PASSWORD_ENCODER)
-				;
-	}
-
-	private static class CustomPasswordEncoder implements PasswordEncoder {
-		@Override
-		public String encode(CharSequence charSequence) {
-			return charSequence.toString();
-		}
-
-		@Override
-		public boolean matches(CharSequence charSequence, String s) {
-			return s != null && s.equals(charSequence.toString());
-		}
-	}
 }

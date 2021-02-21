@@ -16,6 +16,8 @@ wicket:
     spring:
       security:
         enabled: true
+pt:
+  admin-password: admin
 
 ---
 
@@ -25,3 +27,5 @@ spring:
     url: ${JDBC_DATABASE_URL}
     username: ${JDBC_DATABASE_USERNAME}
     password: ${JDBC_DATABASE_PASSWORD}
+pt:
+  admin-password: ${ADMIN_PASSWORD}
