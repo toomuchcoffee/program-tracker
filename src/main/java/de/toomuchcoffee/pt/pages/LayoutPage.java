@@ -3,12 +3,12 @@ package de.toomuchcoffee.pt.pages;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
 
 public class LayoutPage extends WebPage {
-    public LayoutPage(PageParameters parameters) {
-        super(parameters);
+    @Override
+    protected void onInitialize() {
+        super.onInitialize();
         add(new MenuPanel("menuPanel"));
     }
 

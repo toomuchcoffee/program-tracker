@@ -3,18 +3,21 @@ package de.toomuchcoffee.pt.pages;
 import com.giffing.wicket.spring.boot.context.scan.WicketSignInPage;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebSession;
+import org.apache.wicket.feedback.ExactLevelFeedbackMessageFilter;
+import org.apache.wicket.feedback.FeedbackCollector;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
+
+import static org.apache.wicket.feedback.FeedbackMessage.ERROR;
 
 @WicketSignInPage
 public class LoginPage extends LayoutPage {
-    public LoginPage(PageParameters parameters) {
-        super(parameters);
-
+    @Override
+    protected void onInitialize() {
+        super.onInitialize();
         if (((AbstractAuthenticatedWebSession) getSession()).isSignedIn()) {
             continueToOriginalDestination();
         }
@@ -30,7 +33,14 @@ public class LoginPage extends LayoutPage {
         public LoginForm(String id) {
             super(id);
             setModel(new CompoundPropertyModel<>(this));
-            add(new FeedbackPanel("feedback"));
+
+            FeedbackCollector collector = new FeedbackCollector(this);
+            ExactLevelFeedbackMessageFilter errorFilter = new ExactLevelFeedbackMessageFilter(ERROR);
+            add(new FeedbackPanel("errorMessages", errorFilter) {
+                @Override public boolean isVisible() {
+                    return !collector.collect(errorFilter).isEmpty();
+                }
+            });
             add(new RequiredTextField<String>("username"));
             add(new PasswordTextField("password"));
         }
