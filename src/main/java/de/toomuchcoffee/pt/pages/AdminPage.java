@@ -71,13 +71,19 @@ public class AdminPage extends LayoutPage {
 
         public CreateUserForm(String id) {
             super(id);
+        }
+
+        @Override
+        protected void onInitialize() {
             setModel(new CompoundPropertyModel<>(this));
 
             FeedbackCollector collector = new FeedbackCollector(this);
             ExactLevelFeedbackMessageFilter errorFilter = new ExactLevelFeedbackMessageFilter(ERROR);
             add(new FeedbackPanel("errorMessages", errorFilter) {
-                @Override public boolean isVisible() {
-                    return !collector.collect(errorFilter).isEmpty();
+                @Override
+                protected void onConfigure() {
+                    super.onConfigure();
+                    setVisible(!collector.collect(errorFilter).isEmpty());
                 }
             });
 
@@ -87,6 +93,7 @@ public class AdminPage extends LayoutPage {
             DropDownChoice<Role> dropDownChoice = new DropDownChoice<>("role", new PropertyModel<>(getModel(), "role"), roles);
             dropDownChoice.setRequired(true);
             add(dropDownChoice);
+            super.onInitialize();
         }
 
         @Override

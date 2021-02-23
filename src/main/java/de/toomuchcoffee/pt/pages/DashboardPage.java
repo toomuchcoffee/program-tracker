@@ -5,5 +5,13 @@ import org.apache.wicket.authroles.authorization.strategies.role.annotations.Aut
 
 @WicketHomePage
 @AuthorizeInstantiation("USER")
-public class HomePage extends LayoutPage {
+public class DashboardPage extends LayoutPage {
+
+    @Override
+    protected void onInitialize() {
+        super.onInitialize();
+
+        add(new ClientDashboardPanel("clientDashboard"));
+        add(new CoachDashboardPanel("coachDashboard"));
+    }
 }

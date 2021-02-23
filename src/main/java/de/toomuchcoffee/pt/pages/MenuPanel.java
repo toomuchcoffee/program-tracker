@@ -20,17 +20,28 @@ public class MenuPanel extends Panel {
             public void onClick() {
                 MenuPanel.this.setResponsePage(AdminPage.class);
             }
+
+            @Override
+            protected void onConfigure() {
+                super.onConfigure();
+                setVisible(session.isSignedIn() && session.getRoles().hasRole("ADMIN"));
+            }
         };
-        adminLink.setVisible(session.isSignedIn() && session.getRoles().hasRole("ADMIN"));
         add(adminLink);
 
         Link<Void> logoutLink = new Link<>("logoutLink") {
             @Override
             public void onClick() {
                 getSession().invalidate();
+                setResponsePage(DashboardPage.class);
+            }
+
+            @Override
+            protected void onConfigure() {
+                super.onConfigure();
+                setVisible(session.isSignedIn());
             }
         };
-        logoutLink.setVisible(session.isSignedIn());
         add(logoutLink);
     }
 }

@@ -32,13 +32,20 @@ public class LoginPage extends LayoutPage {
 
         public LoginForm(String id) {
             super(id);
+        }
+
+        @Override
+        protected void onInitialize() {
+            super.onInitialize();
             setModel(new CompoundPropertyModel<>(this));
 
             FeedbackCollector collector = new FeedbackCollector(this);
             ExactLevelFeedbackMessageFilter errorFilter = new ExactLevelFeedbackMessageFilter(ERROR);
             add(new FeedbackPanel("errorMessages", errorFilter) {
-                @Override public boolean isVisible() {
-                    return !collector.collect(errorFilter).isEmpty();
+                @Override
+                protected void onConfigure() {
+                    super.onConfigure();
+                    setVisible(!collector.collect(errorFilter).isEmpty());
                 }
             });
             add(new RequiredTextField<String>("username"));
@@ -49,7 +56,8 @@ public class LoginPage extends LayoutPage {
         protected void onSubmit() {
             AuthenticatedWebSession session = AuthenticatedWebSession.get();
             if (session.signIn(username, password)) {
-                setResponsePage(HomePage.class);
+                session.setAttribute("username", username);
+                setResponsePage(DashboardPage.class);
             } else {
                 error("Login failed");
             }
