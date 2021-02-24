@@ -1,5 +1,6 @@
-package de.toomuchcoffee.pt.pages;
+package de.toomuchcoffee.pt.page;
 
+import de.toomuchcoffee.pt.panel.MenuPanel;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;

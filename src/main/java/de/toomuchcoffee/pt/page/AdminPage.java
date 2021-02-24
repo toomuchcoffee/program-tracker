@@ -1,4 +1,4 @@
-package de.toomuchcoffee.pt.pages;
+package de.toomuchcoffee.pt.page;
 
 import de.toomuchcoffee.pt.domain.entity.Role;
 import de.toomuchcoffee.pt.domain.entity.User;

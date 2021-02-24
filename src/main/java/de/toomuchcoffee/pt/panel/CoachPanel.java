@@ -1,26 +1,26 @@
-package de.toomuchcoffee.pt.pages;
+package de.toomuchcoffee.pt.panel;
 
 
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 
-public class ClientDashboardPanel extends Panel {
+public class CoachPanel extends Panel {
 
-    public ClientDashboardPanel(String id) {
+    public CoachPanel(String id) {
         super(id);
     }
 
     @Override
     protected void onInitialize() {
         super.onInitialize();
-        add(new Label("clientDashboardHeader", (String) getSession().getAttribute("username")));
+        add(new Label("coachHeader", (String) getSession().getAttribute("username")));
     }
 
     @Override
     protected void onConfigure() {
         super.onConfigure();
         AbstractAuthenticatedWebSession session = (AbstractAuthenticatedWebSession) getSession();
-        setVisible(session.getRoles().hasRole("CLIENT") || session.getRoles().hasRole("ADMIN"));
+        setVisible(session.getRoles().hasRole("COACH") || session.getRoles().hasRole("ADMIN"));
     }
 }

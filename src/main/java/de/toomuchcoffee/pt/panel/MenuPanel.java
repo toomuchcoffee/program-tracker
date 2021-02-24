@@ -1,5 +1,7 @@
-package de.toomuchcoffee.pt.pages;
+package de.toomuchcoffee.pt.panel;
 
+import de.toomuchcoffee.pt.page.AdminPage;
+import de.toomuchcoffee.pt.page.DashboardPage;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;

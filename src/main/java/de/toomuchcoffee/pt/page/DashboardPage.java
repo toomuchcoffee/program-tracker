@@ -1,6 +1,8 @@
-package de.toomuchcoffee.pt.pages;
+package de.toomuchcoffee.pt.page;
 
 import com.giffing.wicket.spring.boot.context.scan.WicketHomePage;
+import de.toomuchcoffee.pt.panel.ClientPanel;
+import de.toomuchcoffee.pt.panel.CoachPanel;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 
 @WicketHomePage
@@ -11,7 +13,7 @@ public class DashboardPage extends LayoutPage {
     protected void onInitialize() {
         super.onInitialize();
 
-        add(new ClientDashboardPanel("clientDashboard"));
-        add(new CoachDashboardPanel("coachDashboard"));
+        add(new ClientPanel("clientPanel"));
+        add(new CoachPanel("coachPanel"));
     }
 }

@@ -1,4 +1,4 @@
-package de.toomuchcoffee.pt.pages;
+package de.toomuchcoffee.pt.page;
 
 import com.giffing.wicket.spring.boot.context.scan.WicketSignInPage;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
