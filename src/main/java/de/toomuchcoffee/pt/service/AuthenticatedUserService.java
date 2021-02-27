@@ -1,5 +1,7 @@
 package de.toomuchcoffee.pt.service;
 
+import de.toomuchcoffee.pt.domain.entity.Client;
+import de.toomuchcoffee.pt.domain.entity.Coach;
 import de.toomuchcoffee.pt.domain.entity.Role;
 import de.toomuchcoffee.pt.domain.entity.User;
 import de.toomuchcoffee.pt.domain.repository.UserRepository;
@@ -27,13 +29,20 @@ public class AuthenticatedUserService implements UserDetailsService {
 
     @Transactional
     public void save(String username, String password, Role role) {
-        User user = userRepository.findById(username)
-                .map(found -> {
-                    found.setPassword(encoder.encode(password));
-                    found.setRole(role);
-                    return found;
-                })
-                .orElse(new User(username, encoder.encode(password), role));
+        User user;
+        switch (role) {
+            case CLIENT:
+                user = new Client();
+                break;
+            case COACH:
+                user = new Coach();
+                break;
+            case ADMIN:
+            default:
+                throw new IllegalArgumentException("Creation of admin user not supported");
+        }
+        user.setUsername(username);
+        user.setPassword(encoder.encode(password));
         userRepository.save(user);
     }
 

@@ -1,5 +1,7 @@
 package de.toomuchcoffee.pt.domain.repository;
 
+import de.toomuchcoffee.pt.domain.entity.Client;
+import de.toomuchcoffee.pt.domain.entity.Coach;
 import de.toomuchcoffee.pt.domain.entity.Role;
 import de.toomuchcoffee.pt.domain.entity.User;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
@@ -33,12 +35,29 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void saves() {
-        User user = new User("foo", "bar", Role.CLIENT);
-        User save = userRepository.save(user);
+    public void saveClient() {
+        Client client = new Client();
+        client.setUsername("foo");
+        client.setPassword("bar");
+        client.setFullName("foobar");
+        User save = userRepository.save(client);
 
         Optional<User> byId = userRepository.findById(save.getUsername());
         assertThat(byId).isPresent();
+        assertThat(byId.get()).isInstanceOf(Client.class);
+    }
+
+    @Test
+    public void saveCoach() {
+        Coach coach = new Coach();
+        coach.setUsername("foo");
+        coach.setPassword("bar");
+        coach.setFullName("foobar");
+        User save = userRepository.save(coach);
+
+        Optional<User> byId = userRepository.findById(save.getUsername());
+        assertThat(byId).isPresent();
+        assertThat(byId.get()).isInstanceOf(Coach.class);
     }
 
 }

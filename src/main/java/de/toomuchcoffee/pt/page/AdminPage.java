@@ -16,6 +16,7 @@ import org.apache.wicket.markup.html.navigation.paging.PagingNavigator;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;
+import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.markup.repeater.data.ListDataProvider;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
@@ -24,6 +25,8 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import java.util.Arrays;
 import java.util.List;
 
+import static de.toomuchcoffee.pt.domain.entity.Role.ADMIN;
+import static java.util.stream.Collectors.toList;
 import static org.apache.wicket.feedback.FeedbackMessage.ERROR;
 
 @AuthorizeInstantiation("ADMIN")
@@ -31,38 +34,41 @@ public class AdminPage extends LayoutPage {
     @SpringBean
     private AuthenticatedUserService authenticatedUserService;
 
-
     @Override
     protected void onInitialize() {
         super.onInitialize();
         add(new CreateUserForm("createUserForm"));
 
-        ListDataProvider<User> userListDataProvider = new ListDataProvider<>() {
+        DataView<User> dataView = new UserListDataView("userList", new ListDataProvider<>() {
             @Override
             protected List<User> getData() {
                 return authenticatedUserService.findAll();
             }
-        };
+        });
 
-        DataView<User> dataView = new DataView<>("userList", userListDataProvider) {
-            @Override
-            protected void populateItem(Item<User> item) {
-                item.add(new Label("username", new PropertyModel<>(item.getModel(), "username")));
-                item.add(new Label("role", new PropertyModel<>(item.getModel(), "role")));
-                item.add(new Link<Void>("deleteUser") {
-                    @Override
-                    public void onClick() {
-                        String username = item.getModel().getObject().getUsername();
-                        authenticatedUserService.deleteByUsername(username);
-                    }
-                });
-            }
-        };
-        dataView.setItemsPerPage(5L);
         add(dataView);
         add(new PagingNavigator("pagingNavigator", dataView));
-
     }
+
+    private class UserListDataView extends DataView<User> {
+        protected UserListDataView(String id, IDataProvider<User> dataProvider) {
+            super(id, dataProvider);
+            setItemsPerPage(5);
+        }
+
+        @Override
+        protected void populateItem(Item<User> item) {
+            item.add(new Label("username", new PropertyModel<>(item.getModel(), "username")));
+            item.add(new Label("role", new PropertyModel<>(item.getModel(), "role")));
+            item.add(new Link<Void>("deleteUser") {
+                @Override
+                public void onClick() {
+                    String username = item.getModel().getObject().getUsername();
+                    authenticatedUserService.deleteByUsername(username);
+                }
+            });
+        }
+    };
 
     private class CreateUserForm extends Form<AdminPage.CreateUserForm> {
         private String username;
@@ -89,7 +95,7 @@ public class AdminPage extends LayoutPage {
 
             add(new RequiredTextField<String>("username"));
             add(new PasswordTextField("password"));
-            List<Role> roles = Arrays.asList(Role.values());
+            List<Role> roles = Arrays.stream(Role.values()).filter(role -> role != ADMIN).collect(toList());
             DropDownChoice<Role> dropDownChoice = new DropDownChoice<>("role", new PropertyModel<>(getModel(), "role"), roles);
             dropDownChoice.setRequired(true);
             add(dropDownChoice);

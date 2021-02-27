@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static java.util.stream.Collectors.toList;
+import static javax.persistence.DiscriminatorType.STRING;
+import static javax.persistence.InheritanceType.SINGLE_TABLE;
 
 @Entity
 @NoArgsConstructor
@@ -20,6 +22,8 @@ import static java.util.stream.Collectors.toList;
 @Getter
 @Setter
 @Table(name = "pt_user")
+@Inheritance(strategy = SINGLE_TABLE)
+@DiscriminatorColumn(name = "role", discriminatorType = STRING)
 public class User implements UserDetails {
     @Id
     private String username;
@@ -27,6 +31,7 @@ public class User implements UserDetails {
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @Column(insertable = false, updatable = false)
     private Role role;
 
     @Override
