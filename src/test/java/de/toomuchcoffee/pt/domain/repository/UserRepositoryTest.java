@@ -2,9 +2,9 @@ package de.toomuchcoffee.pt.domain.repository;
 
 import de.toomuchcoffee.pt.domain.entity.Client;
 import de.toomuchcoffee.pt.domain.entity.Coach;
-import de.toomuchcoffee.pt.domain.entity.Role;
 import de.toomuchcoffee.pt.domain.entity.User;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 import java.util.Optional;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.DOCKER;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,9 +26,17 @@ public class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Before
+    public void setUp() throws Exception {
+        userRepository.deleteAll();
+    }
+
     @Test
     public void findsAll() {
-        User user = new User("foo", "bar", Role.CLIENT);
+        User user = Client.builder()
+                .username("foo")
+                .password("bar")
+                .build();
         userRepository.save(user);
         List<User> figures = userRepository.findAll();
         assertThat(figures).hasSize(1);
@@ -36,10 +45,11 @@ public class UserRepositoryTest {
 
     @Test
     public void saveClient() {
-        Client client = new Client();
-        client.setUsername("foo");
-        client.setPassword("bar");
-        client.setFullName("foobar");
+        Client client = Client.builder()
+                .username("foo")
+                .password("bar")
+                .fullName("foobar")
+                .build();
         User save = userRepository.save(client);
 
         Optional<User> byId = userRepository.findById(save.getUsername());
@@ -49,15 +59,33 @@ public class UserRepositoryTest {
 
     @Test
     public void saveCoach() {
-        Coach coach = new Coach();
-        coach.setUsername("foo");
-        coach.setPassword("bar");
-        coach.setFullName("foobar");
+        Coach coach = Coach.builder()
+                .username("foo")
+                .password("bar")
+                .fullName("foobar")
+                .build();
         User save = userRepository.save(coach);
 
         Optional<User> byId = userRepository.findById(save.getUsername());
         assertThat(byId).isPresent();
         assertThat(byId.get()).isInstanceOf(Coach.class);
+    }
+
+    @Test
+    public void saveCoachWithClient() {
+        User coach = userRepository.save(Coach.builder()
+                .username("coach")
+                .password("coach")
+                .clients(newHashSet(Client.builder()
+                        .username("client")
+                        .password("client")
+                        .build()))
+                .build());
+
+        Optional<User> byId = userRepository.findById(coach.getUsername());
+        assertThat(byId).isPresent();
+        assertThat(byId.get()).isInstanceOf(Coach.class);
+        assertThat(((Coach) byId.get()).getClients()).hasSize(1);
     }
 
 }

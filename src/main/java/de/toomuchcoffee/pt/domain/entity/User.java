@@ -1,9 +1,9 @@
 package de.toomuchcoffee.pt.domain.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,9 +18,9 @@ import static javax.persistence.InheritanceType.SINGLE_TABLE;
 
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
+@SuperBuilder
 @Table(name = "pt_user")
 @Inheritance(strategy = SINGLE_TABLE)
 @DiscriminatorColumn(name = "role", discriminatorType = STRING)
