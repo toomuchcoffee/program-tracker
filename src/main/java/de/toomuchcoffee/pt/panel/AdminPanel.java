@@ -1,9 +1,9 @@
-package de.toomuchcoffee.pt.page;
+package de.toomuchcoffee.pt.panel;
 
 import de.toomuchcoffee.pt.domain.entity.Role;
 import de.toomuchcoffee.pt.domain.entity.User;
 import de.toomuchcoffee.pt.service.AuthenticatedUserService;
-import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.feedback.ExactLevelFeedbackMessageFilter;
 import org.apache.wicket.feedback.FeedbackCollector;
 import org.apache.wicket.markup.html.basic.Label;
@@ -14,6 +14,7 @@ import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.navigation.paging.PagingNavigator;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
@@ -29,10 +30,13 @@ import static de.toomuchcoffee.pt.domain.entity.Role.ADMIN;
 import static java.util.stream.Collectors.toList;
 import static org.apache.wicket.feedback.FeedbackMessage.ERROR;
 
-@AuthorizeInstantiation("ADMIN")
-public class AdminPage extends LayoutPage {
+public class AdminPanel extends Panel {
     @SpringBean
     private AuthenticatedUserService authenticatedUserService;
+
+    public AdminPanel(String id) {
+        super(id);
+    }
 
     @Override
     protected void onInitialize() {
@@ -48,6 +52,14 @@ public class AdminPage extends LayoutPage {
 
         add(dataView);
         add(new PagingNavigator("pagingNavigator", dataView));
+    }
+
+
+    @Override
+    protected void onConfigure() {
+        super.onConfigure();
+        AbstractAuthenticatedWebSession session = (AbstractAuthenticatedWebSession) getSession();
+        setVisible(session.getRoles().hasRole("ADMIN"));
     }
 
     private class UserListDataView extends DataView<User> {
@@ -70,7 +82,7 @@ public class AdminPage extends LayoutPage {
         }
     };
 
-    private class CreateUserForm extends Form<AdminPage.CreateUserForm> {
+    private class CreateUserForm extends Form<AdminPanel.CreateUserForm> {
         private String username;
         private String password;
         private Role role;

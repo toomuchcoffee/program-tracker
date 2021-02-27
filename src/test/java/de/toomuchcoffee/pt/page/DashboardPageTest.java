@@ -2,6 +2,7 @@ package de.toomuchcoffee.pt.page;
 
 import com.giffing.wicket.spring.boot.starter.configuration.extensions.external.spring.security.SecureWebSession;
 import de.toomuchcoffee.pt.domain.entity.Role;
+import de.toomuchcoffee.pt.panel.AdminPanel;
 import de.toomuchcoffee.pt.panel.ClientPanel;
 import de.toomuchcoffee.pt.panel.CoachPanel;
 import de.toomuchcoffee.pt.service.AuthenticatedUserService;
@@ -51,11 +52,7 @@ public class DashboardPageTest {
 
         tester.startPage(DashboardPage.class);
         tester.assertRenderedPage(DashboardPage.class);
-        tester.assertComponent("clientPanel", ClientPanel.class);
-        tester.assertComponent("coachPanel", CoachPanel.class);
-
-        tester.clickLink("menuPanel:adminLink");
-        tester.assertRenderedPage(AdminPage.class);
+        tester.assertComponent("adminPanel", AdminPanel.class);
 
         tester.clickLink("menuPanel:logoutLink");
         tester.assertRenderedPage(LoginPage.class);
@@ -69,8 +66,7 @@ public class DashboardPageTest {
         tester.startPage(DashboardPage.class);
         tester.assertRenderedPage(DashboardPage.class);
         tester.assertComponent("coachPanel", CoachPanel.class);
-
-        tester.assertNotExists("menuPanel:adminLink");
+        tester.assertNotExists("adminPanel");
 
         tester.clickLink("menuPanel:logoutLink");
         tester.assertRenderedPage(LoginPage.class);
@@ -84,7 +80,7 @@ public class DashboardPageTest {
         tester.startPage(DashboardPage.class);
         tester.assertRenderedPage(DashboardPage.class);
         tester.assertComponent("clientPanel", ClientPanel.class);
-        tester.assertNotExists("menuPanel:adminLink");
+        tester.assertNotExists("adminPanel");
 
         tester.clickLink("menuPanel:logoutLink");
         tester.assertRenderedPage(LoginPage.class);

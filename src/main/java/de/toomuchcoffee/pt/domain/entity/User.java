@@ -9,10 +9,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
-import static java.util.stream.Collectors.toList;
 import static javax.persistence.DiscriminatorType.STRING;
 import static javax.persistence.InheritanceType.SINGLE_TABLE;
 
@@ -36,11 +35,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Arrays.stream(role.getAuthorities())
-                .map(String::trim)
-                .map(String::toUpperCase)
-                .map(SimpleGrantedAuthority::new)
-                .collect(toList());
+        return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override

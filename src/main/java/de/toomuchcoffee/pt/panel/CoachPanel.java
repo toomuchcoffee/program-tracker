@@ -14,13 +14,13 @@ public class CoachPanel extends Panel {
     @Override
     protected void onInitialize() {
         super.onInitialize();
-        add(new Label("coachHeader", (String) getSession().getAttribute("username")));
+        add(new Label("coachHeader", String.format("Coach Dashboard: %s", getSession().getAttribute("username"))));
     }
 
     @Override
     protected void onConfigure() {
         super.onConfigure();
         AbstractAuthenticatedWebSession session = (AbstractAuthenticatedWebSession) getSession();
-        setVisible(session.getRoles().hasRole("COACH") || session.getRoles().hasRole("ADMIN"));
+        setVisible(session.getRoles().hasRole("COACH"));
     }
 }

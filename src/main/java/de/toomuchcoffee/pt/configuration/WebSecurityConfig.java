@@ -43,7 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .passwordEncoder(passwordEncoder)
                 .withUser(ADMIN_USERNAME)
                 .password(passwordEncoder.encode(adminPassword))
-                .authorities(ADMIN.getAuthorities());
+                .authorities(ADMIN.name());
         auth.userDetailsService(authenticatedUserService)
                 .passwordEncoder(passwordEncoder);
     }
