@@ -5,7 +5,7 @@ import de.toomuchcoffee.pt.domain.entity.Role;
 import de.toomuchcoffee.pt.panel.AdminPanel;
 import de.toomuchcoffee.pt.panel.ClientPanel;
 import de.toomuchcoffee.pt.panel.CoachPanel;
-import de.toomuchcoffee.pt.service.AuthenticatedUserService;
+import de.toomuchcoffee.pt.service.UserService;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.protocol.http.mock.MockServletContext;
@@ -29,14 +29,14 @@ public class DashboardPageTest {
     private WebApplication wicketApplication;
 
     @Autowired
-    private AuthenticatedUserService authenticatedUserService;
+    private UserService userService;
 
     @Before
     public void setUp() {
         tester = new WicketTester(wicketApplication, new MockServletContext(wicketApplication, null));
 
-        authenticatedUserService.save("coach", "coach", Role.COACH);
-        authenticatedUserService.save("client", "client", Role.CLIENT);
+        userService.save("coach", "coach", Role.COACH);
+        userService.save("client", "client", Role.CLIENT);
     }
 
     @Test

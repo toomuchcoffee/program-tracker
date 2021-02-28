@@ -15,8 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
-public class AuthenticatedUserService implements UserDetailsService {
+public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -25,6 +27,10 @@ public class AuthenticatedUserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findById(username).orElseThrow(() -> new UsernameNotFoundException(username));
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findById(username).orElse(null);
     }
 
     @Transactional
@@ -48,6 +54,13 @@ public class AuthenticatedUserService implements UserDetailsService {
 
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    public List<Client> findAllClients() {
+        return userRepository.findAll().stream()
+                .filter(u -> u instanceof Client)
+                .map(u -> (Client) u)
+                .collect(toList());
     }
 
     public void deleteByUsername(String username) {

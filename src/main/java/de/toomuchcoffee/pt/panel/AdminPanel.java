@@ -2,7 +2,7 @@ package de.toomuchcoffee.pt.panel;
 
 import de.toomuchcoffee.pt.domain.entity.Role;
 import de.toomuchcoffee.pt.domain.entity.User;
-import de.toomuchcoffee.pt.service.AuthenticatedUserService;
+import de.toomuchcoffee.pt.service.UserService;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.feedback.ExactLevelFeedbackMessageFilter;
 import org.apache.wicket.feedback.FeedbackCollector;
@@ -32,7 +32,7 @@ import static org.apache.wicket.feedback.FeedbackMessage.ERROR;
 
 public class AdminPanel extends Panel {
     @SpringBean
-    private AuthenticatedUserService authenticatedUserService;
+    private UserService userService;
 
     public AdminPanel(String id) {
         super(id);
@@ -46,7 +46,7 @@ public class AdminPanel extends Panel {
         DataView<User> dataView = new UserListDataView("userList", new ListDataProvider<>() {
             @Override
             protected List<User> getData() {
-                return authenticatedUserService.findAll();
+                return userService.findAll();
             }
         });
 
@@ -76,7 +76,7 @@ public class AdminPanel extends Panel {
                 @Override
                 public void onClick() {
                     String username = item.getModel().getObject().getUsername();
-                    authenticatedUserService.deleteByUsername(username);
+                    userService.deleteByUsername(username);
                 }
             });
         }
@@ -116,7 +116,7 @@ public class AdminPanel extends Panel {
 
         @Override
         protected void onSubmit() {
-            authenticatedUserService.save(username, password, role);
+            userService.save(username, password, role);
         }
     }
 }

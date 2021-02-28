@@ -1,6 +1,6 @@
 package de.toomuchcoffee.pt.configuration;
 
-import de.toomuchcoffee.pt.service.AuthenticatedUserService;
+import de.toomuchcoffee.pt.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +24,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${pt.admin-password}")
     private String adminPassword;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticatedUserService authenticatedUserService;
+    private final UserService userService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -44,7 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .withUser(ADMIN_USERNAME)
                 .password(passwordEncoder.encode(adminPassword))
                 .authorities(ADMIN.name());
-        auth.userDetailsService(authenticatedUserService)
+        auth.userDetailsService(userService)
                 .passwordEncoder(passwordEncoder);
     }
 
