@@ -5,6 +5,8 @@ import de.toomuchcoffee.pt.domain.entity.Coach;
 import de.toomuchcoffee.pt.domain.entity.Role;
 import de.toomuchcoffee.pt.domain.entity.User;
 import de.toomuchcoffee.pt.domain.repository.UserRepository;
+import de.toomuchcoffee.pt.dto.UserDto;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -50,6 +52,14 @@ public class UserService implements UserDetailsService {
         user.setUsername(username);
         user.setPassword(encoder.encode(password));
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void update(UserDto user) {
+        userRepository.findById(user.getUsername()).ifPresent(u -> {
+            BeanUtils.copyProperties(user, u);
+            userRepository.save(u);
+        });
     }
 
     public List<User> findAll() {

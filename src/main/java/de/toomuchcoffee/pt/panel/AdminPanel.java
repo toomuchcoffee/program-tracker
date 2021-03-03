@@ -1,9 +1,13 @@
 package de.toomuchcoffee.pt.panel;
 
 import de.toomuchcoffee.pt.domain.entity.Role;
-import de.toomuchcoffee.pt.domain.entity.User;
+import de.toomuchcoffee.pt.dto.UserDto;
 import de.toomuchcoffee.pt.service.UserService;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
+import org.apache.wicket.extensions.ajax.markup.html.modal.ModalDialog;
+import org.apache.wicket.extensions.ajax.markup.html.modal.theme.DefaultTheme;
 import org.apache.wicket.feedback.ExactLevelFeedbackMessageFilter;
 import org.apache.wicket.feedback.FeedbackCollector;
 import org.apache.wicket.markup.html.basic.Label;
@@ -22,6 +26,7 @@ import org.apache.wicket.markup.repeater.data.ListDataProvider;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.springframework.beans.BeanUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,19 +39,27 @@ public class AdminPanel extends Panel {
     @SpringBean
     private UserService userService;
 
+    private final ModalDialog userEditDialog;
+
     public AdminPanel(String id) {
         super(id);
-    }
 
-    @Override
-    protected void onInitialize() {
-        super.onInitialize();
         add(new CreateUserForm("createUserForm"));
 
-        DataView<User> dataView = new UserListDataView("userList", new ListDataProvider<>() {
+        userEditDialog = new ModalDialog("editUserModal");
+        userEditDialog.add(new DefaultTheme());
+        userEditDialog.closeOnClick();
+        userEditDialog.closeOnEscape();
+        add(userEditDialog);
+
+        DataView<UserDto> dataView = new UserListDataView("userList", new ListDataProvider<>() {
             @Override
-            protected List<User> getData() {
-                return userService.findAll();
+            protected List<UserDto> getData() {
+                return userService.findAll().stream().map(user -> {
+                    UserDto dto = new UserDto();
+                    BeanUtils.copyProperties(user, dto);
+                    return dto;
+                }).collect(toList());
             }
         });
 
@@ -62,16 +75,23 @@ public class AdminPanel extends Panel {
         setVisible(session.getRoles().hasRole("ADMIN"));
     }
 
-    private class UserListDataView extends DataView<User> {
-        protected UserListDataView(String id, IDataProvider<User> dataProvider) {
+    private class UserListDataView extends DataView<UserDto> {
+        protected UserListDataView(String id, IDataProvider<UserDto> dataProvider) {
             super(id, dataProvider);
             setItemsPerPage(5);
         }
 
         @Override
-        protected void populateItem(Item<User> item) {
+        protected void populateItem(Item<UserDto> item) {
             item.add(new Label("username", new PropertyModel<>(item.getModel(), "username")));
             item.add(new Label("role", new PropertyModel<>(item.getModel(), "role")));
+            item.add(new AjaxLink<Void>("open") {
+                @Override
+                public void onClick(AjaxRequestTarget target) {
+                    UserEditPanel editPanel = new UserEditPanel(ModalDialog.CONTENT_ID, userEditDialog, item.getModel().getObject());
+                    userEditDialog.open(editPanel, target);
+                }
+            });
             item.add(new Link<Void>("deleteUser") {
                 @Override
                 public void onClick() {
