@@ -30,9 +30,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .authorizeRequests().antMatchers("/**").permitAll()
+                .authorizeRequests().antMatchers( "/**").permitAll()
                 .and()
-                .logout()
+                .logout().logoutSuccessUrl("/")
                 .permitAll();
         http.headers().frameOptions().disable();
     }
