@@ -2,6 +2,7 @@ package de.toomuchcoffee.pt.page;
 
 import com.giffing.wicket.spring.boot.starter.configuration.extensions.external.spring.security.SecureWebSession;
 import de.toomuchcoffee.pt.domain.entity.Role;
+import de.toomuchcoffee.pt.dto.CreateUserDto;
 import de.toomuchcoffee.pt.panel.AdminPanel;
 import de.toomuchcoffee.pt.panel.ClientPanel;
 import de.toomuchcoffee.pt.panel.CoachPanel;
@@ -35,8 +36,8 @@ public class DashboardPageTest {
     public void setUp() {
         tester = new WicketTester(wicketApplication, new MockServletContext(wicketApplication, null));
 
-        userService.save("coach", "coach", Role.COACH);
-        userService.save("client", "client", Role.CLIENT);
+        userService.save(CreateUserDto.builder().username("coach").password("coach").role(Role.COACH).build());
+        userService.save(CreateUserDto.builder().username("client").password("client").role(Role.CLIENT).build());
     }
 
     @Test

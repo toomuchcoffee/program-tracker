@@ -1,6 +1,6 @@
 package de.toomuchcoffee.pt.panel;
 
-import de.toomuchcoffee.pt.dto.UserDto;
+import de.toomuchcoffee.pt.dto.UpdateUserDto;
 import de.toomuchcoffee.pt.service.UserService;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalDialog;
 import org.apache.wicket.feedback.ExactLevelFeedbackMessageFilter;
@@ -19,12 +19,12 @@ import static org.apache.wicket.feedback.FeedbackMessage.ERROR;
 
 public class UserEditPanel extends Panel {
     private final ModalDialog modalDialog;
-    private final UserDto user;
+    private final UpdateUserDto user;
 
     @SpringBean
     private UserService userService;
 
-    public UserEditPanel(String id, ModalDialog modalDialog, UserDto user) {
+    public UserEditPanel(String id, ModalDialog modalDialog, UpdateUserDto user) {
         super(id);
         this.modalDialog = modalDialog;
         this.user = user;
@@ -51,7 +51,7 @@ public class UserEditPanel extends Panel {
                 }
             });
 
-            add(new RequiredTextField<String>("username", PropertyModel.of(user, "username")));
+            add(new RequiredTextField<String>("username", PropertyModel.of(user, "username")).setEnabled(false));
             add(new TextField<String>("fullName", PropertyModel.of(user, "fullName")));
             add(new PasswordTextField("password", PropertyModel.of(user, "password")));
             super.onInitialize();
@@ -59,9 +59,13 @@ public class UserEditPanel extends Panel {
 
         @Override
         protected void onSubmit() {
-            userService.update(user);
-            modalDialog.close(null);
-            super.onSubmit();
+            try {
+                userService.update(user);
+                modalDialog.close(null);
+                super.onSubmit();
+            } catch (Exception e) {
+                error("Failed to save: " + e.getMessage());
+            }
         }
     }
 }

@@ -2,10 +2,11 @@ package de.toomuchcoffee.pt.service;
 
 import de.toomuchcoffee.pt.domain.entity.Client;
 import de.toomuchcoffee.pt.domain.entity.Coach;
-import de.toomuchcoffee.pt.domain.entity.Role;
 import de.toomuchcoffee.pt.domain.entity.User;
 import de.toomuchcoffee.pt.domain.repository.UserRepository;
-import de.toomuchcoffee.pt.dto.UserDto;
+import de.toomuchcoffee.pt.dto.CreateUserDto;
+import de.toomuchcoffee.pt.dto.ReadUserDto;
+import de.toomuchcoffee.pt.dto.UpdateUserDto;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,9 +37,9 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void save(String username, String password, Role role) {
+    public void save(CreateUserDto createUserDto) {
         User user;
-        switch (role) {
+        switch (createUserDto.getRole()) {
             case CLIENT:
                 user = new Client();
                 break;
@@ -49,28 +50,28 @@ public class UserService implements UserDetailsService {
             default:
                 throw new IllegalArgumentException("Creation of admin user not supported");
         }
-        user.setUsername(username);
-        user.setPassword(encoder.encode(password));
+        user.setUsername(createUserDto.getUsername());
+        user.setPassword(encoder.encode(createUserDto.getPassword()));
         userRepository.save(user);
     }
 
     @Transactional
-    public void update(UserDto user) {
-        userRepository.findById(user.getUsername()).ifPresent(u -> {
+    public void update(UpdateUserDto user) {
+        userRepository.findById(user.getUsername()).ifPresentOrElse(u -> {
             BeanUtils.copyProperties(user, u);
             userRepository.save(u);
+        }, () -> {
+            throw new IllegalArgumentException("Could not find existing user with username " + user.getUsername());
         });
     }
 
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
-
-    public List<Client> findAllClients() {
+    public List<ReadUserDto> findAll() {
         return userRepository.findAll().stream()
-                .filter(u -> u instanceof Client)
-                .map(u -> (Client) u)
-                .collect(toList());
+                .map(user -> {
+                    ReadUserDto dto = new ReadUserDto();
+                    BeanUtils.copyProperties(user, dto);
+                    return dto;
+                }).collect(toList());
     }
 
     public void deleteByUsername(String username) {

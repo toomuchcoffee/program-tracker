@@ -1,14 +1,16 @@
 package de.toomuchcoffee.pt.dto;
 
 import de.toomuchcoffee.pt.domain.entity.Role;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
 @Getter
 @Setter
-public class UserDto implements Serializable {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ReadUserDto implements Serializable {
     private String username;
     private String password;
     private String fullName;
