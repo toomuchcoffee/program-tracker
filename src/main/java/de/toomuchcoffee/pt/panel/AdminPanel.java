@@ -97,7 +97,7 @@ public class AdminPanel extends Panel {
                 @Override
                 public void onClick() {
                     String username = item.getModel().getObject().getUsername();
-                    userService.deleteByUsername(username);
+                    userService.delete(username);
                 }
             });
         }
@@ -134,7 +134,7 @@ public class AdminPanel extends Panel {
 
         @Override
         protected void onSubmit() {
-            userService.save(getModelObject());
+            userService.create(getModelObject());
             setModelObject(new CreateUserDto());
         }
     }

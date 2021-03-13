@@ -1,7 +1,7 @@
 package de.toomuchcoffee.pt.panel;
 
 import de.toomuchcoffee.pt.dto.UpdateUserDto;
-import de.toomuchcoffee.pt.service.UserService;
+import de.toomuchcoffee.pt.service.CoachService;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponentUpdatingBehavior;
@@ -20,7 +20,7 @@ import static de.toomuchcoffee.pt.domain.entity.Role.COACH;
 
 public class ClientsPanel extends Panel {
     @SpringBean
-    private UserService userService;
+    private CoachService coachService;
 
     private String selectedClient;
 
@@ -35,11 +35,11 @@ public class ClientsPanel extends Panel {
     protected void onInitialize() {
         super.onInitialize();
 
-        List<String> clients = userService.findAvailableClients();
+        List<String> clients = coachService.findAvailableClients();
         DropDownChoice<String> dropDownChoice = new DropDownChoice<>("availableClients", PropertyModel.of(this, "selectedClient"), clients);
         dropDownChoice.add(new FormComponentUpdatingBehavior() {
             protected void onUpdate() {
-                userService.addClient(user, dropDownChoice.getModel().getObject());
+                coachService.addClient(user, dropDownChoice.getModel().getObject());
             }
         });
         add(dropDownChoice);
@@ -47,7 +47,7 @@ public class ClientsPanel extends Panel {
         DataView<String> dataView = new ClientListDataView("clientList", new ListDataProvider<>() {
             @Override
             protected List<String> getData() {
-                return userService.findClientsForCoach(user.getUsername());
+                return coachService.findAssignedClientsForCoach(user.getUsername());
             }
         });
 
@@ -72,7 +72,7 @@ public class ClientsPanel extends Panel {
             item.add(new Link<Void>("removeClient") {
                 @Override
                 public void onClick() {
-                    userService.removeClient(user, item.getModel().getObject());
+                    coachService.removeClient(user, item.getModel().getObject());
                 }
             });
         }

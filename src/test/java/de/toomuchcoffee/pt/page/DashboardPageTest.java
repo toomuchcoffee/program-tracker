@@ -36,8 +36,8 @@ public class DashboardPageTest {
     public void setUp() {
         tester = new WicketTester(wicketApplication, new MockServletContext(wicketApplication, null));
 
-        userService.save(CreateUserDto.builder().username("coach").password("coach").role(Role.COACH).build());
-        userService.save(CreateUserDto.builder().username("client").password("client").role(Role.CLIENT).build());
+        userService.create(CreateUserDto.builder().username("coach").password("coach").role(Role.COACH).build());
+        userService.create(CreateUserDto.builder().username("client").password("client").role(Role.CLIENT).build());
     }
 
     @Test
