@@ -29,6 +29,8 @@ public class User implements UserDetails {
 
     private String password;
 
+    private String fullName;
+
     @Enumerated(EnumType.STRING)
     @Column(insertable = false, updatable = false)
     private Role role;

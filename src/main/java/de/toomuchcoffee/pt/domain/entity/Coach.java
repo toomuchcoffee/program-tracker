@@ -19,8 +19,6 @@ import static javax.persistence.FetchType.EAGER;
 @Table(name = "pt_user")
 @DiscriminatorValue("COACH")
 public class Coach extends User {
-    private String fullName;
-
     @OneToMany(mappedBy = "coach", fetch = EAGER)
     private Set<Client> clients = new HashSet<>();
 

@@ -5,6 +5,7 @@ import de.toomuchcoffee.pt.domain.entity.Role;
 import de.toomuchcoffee.pt.dto.CreateUserDto;
 import de.toomuchcoffee.pt.dto.ReadUserDto;
 import de.toomuchcoffee.pt.dto.UpdateUserDto;
+import de.toomuchcoffee.pt.mapper.UserMapper;
 import de.toomuchcoffee.pt.service.UserService;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
@@ -18,7 +19,6 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.RequiredTextField;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
@@ -28,12 +28,12 @@ import org.apache.wicket.markup.repeater.data.ListDataProvider;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.springframework.beans.BeanUtils;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static de.toomuchcoffee.pt.domain.entity.Role.ADMIN;
+import static de.toomuchcoffee.pt.domain.entity.Role.COACH;
 import static java.util.stream.Collectors.toList;
 import static org.apache.wicket.extensions.ajax.markup.html.modal.ModalDialog.CONTENT_ID;
 import static org.apache.wicket.feedback.FeedbackMessage.ERROR;
@@ -41,6 +41,8 @@ import static org.apache.wicket.feedback.FeedbackMessage.ERROR;
 public class AdminPanel extends Panel {
     @SpringBean
     private UserService userService;
+    @SpringBean
+    private UserMapper userMapper;
 
     private final ModalDialog modalDialog;
 
@@ -84,24 +86,18 @@ public class AdminPanel extends Panel {
         protected void populateItem(Item<ReadUserDto> item) {
             item.add(new Label("username", new PropertyModel<>(item.getModel(), "username")));
             item.add(new Label("role", new PropertyModel<>(item.getModel(), "role")));
+            final ReadUserDto readUserDto = item.getModel().getObject();
             item.add(new AjaxLink<Void>("openUserEditDialogLink") {
                 @Override
                 public void onClick(AjaxRequestTarget target) {
-                    UpdateUserDto updateUserDto = new UpdateUserDto();
-                    BeanUtils.copyProperties(item.getModel().getObject(), updateUserDto);
-                    UserEditPanel editPanel = new UserEditPanel(CONTENT_ID, modalDialog, updateUserDto);
+                    UpdateUserDto updateUserDto = userMapper.mapToUpdateUserDto(readUserDto);
+                    UserEditPanel editPanel = new UserEditPanel(
+                            CONTENT_ID, modalDialog, updateUserDto, readUserDto.getRole() == COACH);
                     modalDialog.open(editPanel, target);
                 }
             });
-            item.add(new Link<Void>("deleteUser") {
-                @Override
-                public void onClick() {
-                    String username = item.getModel().getObject().getUsername();
-                    userService.delete(username);
-                }
-            });
         }
-    };
+    }
 
     private class CreateUserForm extends Form<CreateUserDto> {
 

@@ -1,7 +1,12 @@
 package de.toomuchcoffee.pt.panel;
 
 import de.toomuchcoffee.pt.dto.UpdateUserDto;
+import de.toomuchcoffee.pt.page.DashboardPage;
 import de.toomuchcoffee.pt.service.UserService;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.attributes.AjaxCallListener;
+import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalDialog;
 import org.apache.wicket.feedback.ExactLevelFeedbackMessageFilter;
 import org.apache.wicket.feedback.FeedbackCollector;
@@ -20,14 +25,16 @@ import static org.apache.wicket.feedback.FeedbackMessage.ERROR;
 public class UserEditPanel extends Panel {
     private final ModalDialog modalDialog;
     private final UpdateUserDto user;
+    private final boolean coachMode;
 
     @SpringBean
     private UserService userService;
 
-    public UserEditPanel(String id, ModalDialog modalDialog, UpdateUserDto user) {
+    public UserEditPanel(String id, ModalDialog modalDialog, UpdateUserDto user, boolean coachMode) {
         super(id);
         this.modalDialog = modalDialog;
         this.user = user;
+        this.coachMode = coachMode;
         add(new EditUserForm("editUserForm"));
     }
 
@@ -53,8 +60,24 @@ public class UserEditPanel extends Panel {
 
             add(new RequiredTextField<String>("username", PropertyModel.of(user, "username")).setEnabled(false));
             add(new TextField<String>("fullName", PropertyModel.of(user, "fullName")));
-            add(new PasswordTextField("password", PropertyModel.of(user, "password")));
-            add(new ClientsPanel("clientsPanel", user));
+            add(new PasswordTextField("password", PropertyModel.of(user, "password")).setRequired(false));
+            add(new ClientsPanel("clientsPanel", user, coachMode));
+            add(new AjaxButton("deleteButton") {
+                @Override
+                protected void onSubmit(AjaxRequestTarget target) {
+                    userService.delete(user.getUsername());
+                    modalDialog.close(target);
+                    setResponsePage(DashboardPage.class);
+                }
+
+                @Override
+                protected void updateAjaxAttributes( AjaxRequestAttributes attributes ) {
+                    super.updateAjaxAttributes( attributes );
+                    AjaxCallListener ajaxCallListener = new AjaxCallListener();
+                    ajaxCallListener.onPrecondition( "return confirm('Are you sure?');" );
+                    attributes.getAjaxCallListeners().add( ajaxCallListener );
+                }
+            });
             super.onInitialize();
         }
 
@@ -63,7 +86,6 @@ public class UserEditPanel extends Panel {
             try {
                 userService.update(user);
                 modalDialog.close(null);
-                super.onSubmit();
             } catch (Exception e) {
                 error("Failed to save: " + e.getMessage());
             }

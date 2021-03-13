@@ -15,8 +15,6 @@ import javax.persistence.*;
 @Table(name = "pt_user")
 @DiscriminatorValue("CLIENT")
 public class Client extends User {
-    private String fullName;
-
     @ManyToOne
     @JoinColumn(name = "coach_id")
     private Coach coach;

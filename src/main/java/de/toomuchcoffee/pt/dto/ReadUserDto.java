@@ -12,7 +12,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class ReadUserDto implements Serializable {
     private String username;
-    private String password;
     private String fullName;
     private Role role;
 }

@@ -16,8 +16,6 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.util.List;
 
-import static de.toomuchcoffee.pt.domain.entity.Role.COACH;
-
 public class ClientsPanel extends Panel {
     @SpringBean
     private CoachService coachService;
@@ -26,9 +24,12 @@ public class ClientsPanel extends Panel {
 
     private final UpdateUserDto user;
 
-    public ClientsPanel(String id, UpdateUserDto user) {
+    private final boolean coachMode;
+
+    public ClientsPanel(String id, UpdateUserDto user, boolean coachMode) {
         super(id);
         this.user = user;
+        this.coachMode = coachMode;
     }
 
     @Override
@@ -57,7 +58,7 @@ public class ClientsPanel extends Panel {
     @Override
     protected void onConfigure() {
         super.onConfigure();
-        setVisible(user.getRole() == COACH);
+        setVisible(coachMode);
     }
 
     private class ClientListDataView extends DataView<String> {
