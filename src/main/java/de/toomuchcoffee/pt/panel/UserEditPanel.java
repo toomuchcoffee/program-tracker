@@ -54,6 +54,7 @@ public class UserEditPanel extends Panel {
             add(new RequiredTextField<String>("username", PropertyModel.of(user, "username")).setEnabled(false));
             add(new TextField<String>("fullName", PropertyModel.of(user, "fullName")));
             add(new PasswordTextField("password", PropertyModel.of(user, "password")));
+            add(new ClientsPanel("clientsPanel", user));
             super.onInitialize();
         }
 

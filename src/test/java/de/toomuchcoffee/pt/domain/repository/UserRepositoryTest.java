@@ -14,7 +14,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 import java.util.Optional;
 
-import static com.google.common.collect.Sets.newHashSet;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.DOCKER;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -69,23 +68,6 @@ public class UserRepositoryTest {
         Optional<User> byId = userRepository.findById(save.getUsername());
         assertThat(byId).isPresent();
         assertThat(byId.get()).isInstanceOf(Coach.class);
-    }
-
-    @Test
-    public void saveCoachWithClient() {
-        User coach = userRepository.save(Coach.builder()
-                .username("coach")
-                .password("coach")
-                .clients(newHashSet(Client.builder()
-                        .username("client")
-                        .password("client")
-                        .build()))
-                .build());
-
-        Optional<User> byId = userRepository.findById(coach.getUsername());
-        assertThat(byId).isPresent();
-        assertThat(byId.get()).isInstanceOf(Coach.class);
-        assertThat(((Coach) byId.get()).getClients()).hasSize(1);
     }
 
 }

@@ -10,13 +10,16 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.protocol.http.WebApplication;
 
 public class MenuPanel extends Panel {
-    private Navbar navbar;
+
+    public MenuPanel(String id) {
+        super(id);
+    }
 
     @Override
     protected void onInitialize() {
         super.onInitialize();
 
-        navbar = new Navbar("navbar");
+        Navbar navbar = new Navbar("navbar");
         navbar.setBrandName(Model.of("Program Tracker"));
 
         String logoutUrl = ((WebApplication) getApplication()).getServletContext().getContextPath() + "/logout";
@@ -25,9 +28,6 @@ public class MenuPanel extends Panel {
         navbar.addComponents(NavbarComponents.transform(Navbar.ComponentPosition.RIGHT, logoutLink));
 
         add(navbar);
-    }
-    public MenuPanel(String id) {
-        super(id);
     }
 
     public static class LogoutLink extends NavbarExternalLink {

@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -57,12 +58,13 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void update(UpdateUserDto user) {
-        userRepository.findById(user.getUsername()).ifPresentOrElse(u -> {
-            BeanUtils.copyProperties(user, u);
-            userRepository.save(u);
-        }, () -> {
-            throw new IllegalArgumentException("Could not find existing user with username " + user.getUsername());
-        });
+        userRepository.findById(user.getUsername())
+                .ifPresentOrElse(u -> {
+                    BeanUtils.copyProperties(user, u);
+                    userRepository.save(u);
+                }, () -> {
+                    throw new IllegalArgumentException("Could not find existing user with username " + user.getUsername());
+                });
     }
 
     public List<ReadUserDto> findAll() {
@@ -76,5 +78,53 @@ public class UserService implements UserDetailsService {
 
     public void deleteByUsername(String username) {
         userRepository.deleteById(username);
+    }
+
+    public List<String> findAvailableClients() {
+        return userRepository.findAll().stream()
+                .filter(u -> u instanceof Client)
+                .map(Client.class::cast)
+                .filter(client -> client.getCoach() == null)
+                .map(Client::getUsername)
+                .collect(toList());
+    }
+
+    public List<String> findClientsForCoach(String username) {
+        return userRepository.findById(username)
+                .filter(u -> u instanceof Coach)
+                .map(Coach.class::cast)
+                .map(Coach::getClients)
+                .map(clients -> clients.stream()
+                        .map(User::getUsername)
+                        .collect(toList()))
+                .orElse(new ArrayList<>());
+    }
+
+    public void addClient(UpdateUserDto coach, String clientUsername) {
+        userRepository.findById(coach.getUsername())
+                .map(Coach.class::cast)
+                .ifPresentOrElse(c -> userRepository.findById(clientUsername)
+                        .map(Client.class::cast)
+                        .ifPresent(u -> {
+                            u.setCoach(c);
+                            userRepository.save(u);
+                        }), () -> {
+                    throw new IllegalArgumentException("Could not find existing user with username " + coach.getUsername());
+                });
+    }
+
+    public void removeClient(UpdateUserDto coach, String clientUsername) {
+        userRepository.findById(coach.getUsername())
+                .map(Coach.class::cast)
+                .ifPresentOrElse(c -> {
+                    userRepository.findById(clientUsername)
+                            .map(Client.class::cast)
+                            .ifPresent(client -> {
+                                client.setCoach(null);
+                                userRepository.save(client);
+                            });
+                }, () -> {
+                    throw new IllegalArgumentException("Could not find existing user with username " + coach.getUsername());
+                });
     }
 }

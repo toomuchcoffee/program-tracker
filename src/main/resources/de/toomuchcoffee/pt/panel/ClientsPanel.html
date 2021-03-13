@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:wicket="http://wicket.apache.org">
+<head>
+</head>
+<body>
+<wicket:panel>
+    <fieldset>
+        <legend>Assign Clients</legend>
+        <div class="form-group">
+
+            <wicket:label for="availableClients">Available Clients</wicket:label>
+            <select wicket:id="availableClients" key="availableCLients" class="form-control" id="availableClients"/>
+
+            <strong>Assigned Clients</strong>
+            <ul class="nav nav-pills">
+                <li class="nav-item" wicket:id="clientList">
+                    <a href="#">
+                        <span wicket:id="clientUsername"></span>
+                        <span class="btn btn-danger" wicket:id="removeClient">
+                            <i class="glyphicon glyphicon-trash"></i>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </fieldset>
+</wicket:panel>
+</body>
+</html>

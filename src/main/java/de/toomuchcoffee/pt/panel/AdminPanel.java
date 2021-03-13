@@ -84,7 +84,7 @@ public class AdminPanel extends Panel {
         protected void populateItem(Item<ReadUserDto> item) {
             item.add(new Label("username", new PropertyModel<>(item.getModel(), "username")));
             item.add(new Label("role", new PropertyModel<>(item.getModel(), "role")));
-            item.add(new AjaxLink<Void>("open") {
+            item.add(new AjaxLink<Void>("openUserEditDialogLink") {
                 @Override
                 public void onClick(AjaxRequestTarget target) {
                     UpdateUserDto updateUserDto = new UpdateUserDto();
