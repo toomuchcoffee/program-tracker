@@ -7,12 +7,11 @@ import de.toomuchcoffee.pt.domain.repository.UserRepository;
 import de.toomuchcoffee.pt.dto.CreateUserDto;
 import de.toomuchcoffee.pt.dto.ReadUserDto;
 import de.toomuchcoffee.pt.dto.UpdateUserDto;
-import org.springframework.beans.BeanUtils;
+import de.toomuchcoffee.pt.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,9 +23,9 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class UserService implements UserDetailsService {
     @Autowired
-    private UserRepository userRepository;
+    private UserMapper userMapper;
     @Autowired
-    private PasswordEncoder encoder;
+    private UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -51,8 +50,7 @@ public class UserService implements UserDetailsService {
             default:
                 throw new IllegalArgumentException("Creation of admin user not supported");
         }
-        user.setUsername(createUserDto.getUsername());
-        user.setPassword(encoder.encode(createUserDto.getPassword()));
+        userMapper.updateUserEntity(createUserDto, user);
         userRepository.save(user);
     }
 
@@ -60,7 +58,7 @@ public class UserService implements UserDetailsService {
     public void update(UpdateUserDto user) {
         userRepository.findById(user.getUsername())
                 .ifPresentOrElse(u -> {
-                    BeanUtils.copyProperties(user, u);
+                    userMapper.updateUserEntity(user, u);
                     userRepository.save(u);
                 }, () -> {
                     throw new IllegalArgumentException("Could not find existing user with username " + user.getUsername());
@@ -69,11 +67,8 @@ public class UserService implements UserDetailsService {
 
     public List<ReadUserDto> findAll() {
         return userRepository.findAll().stream()
-                .map(user -> {
-                    ReadUserDto dto = new ReadUserDto();
-                    BeanUtils.copyProperties(user, dto);
-                    return dto;
-                }).collect(toList());
+                .map(user -> userMapper.mapToReadUserDto(user))
+                .collect(toList());
     }
 
     public void deleteByUsername(String username) {
