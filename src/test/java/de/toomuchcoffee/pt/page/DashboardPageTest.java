@@ -60,6 +60,7 @@ public class DashboardPageTest {
     public void shouldLoginAsCoach(){
         SecureWebSession session = (SecureWebSession) tester.getSession();
         session.signIn("coach", "coach");
+        session.setAttribute("username", "coach");
 
         tester.startPage(DashboardPage.class);
         tester.assertRenderedPage(DashboardPage.class);

@@ -33,20 +33,20 @@ public class UserRepositoryTest {
     @Test
     public void findsAll() {
         User user = Client.builder()
-                .username("foo")
-                .password("bar")
+                .username("foobar")
+                .password("barbaz")
                 .build();
         userRepository.save(user);
-        List<User> figures = userRepository.findAll();
-        assertThat(figures).hasSize(1);
-        assertThat(figures.get(0)).isEqualToComparingFieldByField(user);
+        List<User> users = userRepository.findAll();
+        assertThat(users).hasSize(1);
+        assertThat(users.get(0)).isEqualToComparingFieldByField(user);
     }
 
     @Test
     public void saveClient() {
         Client client = Client.builder()
-                .username("foo")
-                .password("bar")
+                .username("foobar")
+                .password("barbaz")
                 .fullName("foobar")
                 .build();
         User save = userRepository.save(client);

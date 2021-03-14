@@ -1,10 +1,11 @@
 package de.toomuchcoffee.pt.service;
 
-import de.toomuchcoffee.pt.domain.entity.Client;
-import de.toomuchcoffee.pt.domain.entity.Coach;
-import de.toomuchcoffee.pt.domain.entity.User;
+import de.toomuchcoffee.pt.domain.entity.*;
+import de.toomuchcoffee.pt.domain.repository.ProgramRepository;
 import de.toomuchcoffee.pt.domain.repository.UserRepository;
+import de.toomuchcoffee.pt.dto.ProgramDto;
 import de.toomuchcoffee.pt.dto.UpdateUserDto;
+import de.toomuchcoffee.pt.mapper.ProgramMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,12 @@ import static java.util.stream.Collectors.toList;
 public class CoachService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ProgramRepository programRepository;
+
+    @Autowired
+    private ProgramMapper programMapper;
 
     public List<String> findAvailableClients() {
         return userRepository.findAll().stream()
@@ -64,5 +71,16 @@ public class CoachService {
                 }, () -> {
                     throw new IllegalArgumentException("Could not find existing user with username " + coach.getUsername());
                 });
+    }
+
+    public void saveProgram(ProgramDto programDto) {
+        Program program = programMapper.toEntity(programDto);
+        programRepository.save(program);
+    }
+
+    public ProgramDto retrieveProgram(String coachUsername, String clientUsername) {
+        return programRepository.findById(new ProgramId(coachUsername, clientUsername))
+                .map(program -> programMapper.toDto(program))
+                .orElse(ProgramDto.builder().coach(coachUsername).client(clientUsername).build());
     }
 }
