@@ -5,6 +5,8 @@ import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSessio
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 
+import static de.toomuchcoffee.pt.domain.entity.Role.COACH;
+
 public class CoachPanel extends Panel {
 
     public CoachPanel(String id) {
@@ -21,6 +23,6 @@ public class CoachPanel extends Panel {
     protected void onConfigure() {
         super.onConfigure();
         AbstractAuthenticatedWebSession session = (AbstractAuthenticatedWebSession) getSession();
-        setVisible(session.getRoles().hasRole("COACH"));
+        setVisible(session.getRoles().hasRole(COACH.name()));
     }
 }

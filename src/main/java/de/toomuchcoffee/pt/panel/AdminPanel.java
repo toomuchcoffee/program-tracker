@@ -10,6 +10,7 @@ import de.toomuchcoffee.pt.service.UserService;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
+import org.apache.wicket.bean.validation.PropertyValidator;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalDialog;
 import org.apache.wicket.extensions.ajax.markup.html.modal.theme.DefaultTheme;
 import org.apache.wicket.feedback.ExactLevelFeedbackMessageFilter;
@@ -32,9 +33,8 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import java.util.Arrays;
 import java.util.List;
 
-import static de.toomuchcoffee.pt.domain.entity.Role.ADMIN;
+import static de.toomuchcoffee.pt.configuration.WebSecurityConfig.ADMIN_AUTHORITY;
 import static de.toomuchcoffee.pt.domain.entity.Role.COACH;
-import static java.util.stream.Collectors.toList;
 import static org.apache.wicket.extensions.ajax.markup.html.modal.ModalDialog.CONTENT_ID;
 import static org.apache.wicket.feedback.FeedbackMessage.ERROR;
 
@@ -73,7 +73,7 @@ public class AdminPanel extends Panel {
     protected void onConfigure() {
         super.onConfigure();
         AbstractAuthenticatedWebSession session = (AbstractAuthenticatedWebSession) getSession();
-        setVisible(session.getRoles().hasRole("ADMIN"));
+        setVisible(session.getRoles().hasRole(ADMIN_AUTHORITY));
     }
 
     private class UserListDataView extends DataView<ReadUserDto> {
@@ -119,9 +119,11 @@ public class AdminPanel extends Panel {
                 }
             });
 
-            add(new RequiredTextField<String>("username", PropertyModel.of(getModel(), "username")));
-            add(new PasswordTextField("password", PropertyModel.of(getModel(), "password")));
-            List<Role> roles = Arrays.stream(Role.values()).filter(role -> role != ADMIN).collect(toList());
+            add(new RequiredTextField<String>("username", PropertyModel.of(getModel(), "username"))
+                    .add(new PropertyValidator<>()));
+            add(new PasswordTextField("password", PropertyModel.of(getModel(), "password"))
+                    .add(new PropertyValidator<>()));
+            List<Role> roles = Arrays.asList(Role.values());
             DropDownChoice<Role> dropDownChoice = new DropDownChoice<>("role", PropertyModel.of(getModel(), "role"), roles);
             dropDownChoice.setRequired(true);
             add(dropDownChoice);

@@ -9,6 +9,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -25,8 +27,9 @@ import static javax.persistence.InheritanceType.SINGLE_TABLE;
 @DiscriminatorColumn(name = "role", discriminatorType = STRING)
 public class User implements UserDetails {
     @Id
+    @Pattern(regexp = "^((?!(admin)).)*$")
     private String username;
-
+    @Size(min = 6)
     private String password;
 
     private String fullName;

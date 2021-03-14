@@ -13,13 +13,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static de.toomuchcoffee.pt.domain.entity.Role.ADMIN;
-
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String ADMIN_USERNAME = "admin";
+    public static final String ADMIN_AUTHORITY = "ADMIN";
 
     @Value("${pt.admin-password}")
     private String adminPassword;
@@ -43,7 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .passwordEncoder(passwordEncoder)
                 .withUser(ADMIN_USERNAME)
                 .password(passwordEncoder.encode(adminPassword))
-                .authorities(ADMIN.name());
+                .authorities(ADMIN_AUTHORITY);
         auth.userDetailsService(authenticatedUserService)
                 .passwordEncoder(passwordEncoder);
     }

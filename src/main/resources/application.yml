@@ -16,6 +16,8 @@ wicket:
     spring:
       security:
         enabled: true
+    beanvalidation:
+      enabled: true
 pt:
   admin-password: admin
 
